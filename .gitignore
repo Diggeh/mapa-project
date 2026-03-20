@@ -1,0 +1,12 @@
+# Dependencies
+node_modules
+
+# Environment Variables (CRITICAL)
+.env
+
+# Uploads (You don't want to track the actual PDFs in Git)
+server/uploads/
+
+# OS Files
+.DS_Store
+Thumbs.db
