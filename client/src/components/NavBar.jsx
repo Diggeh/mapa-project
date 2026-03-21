@@ -9,14 +9,23 @@ const NavBar = () => {
   return (
     <>
       <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      
+
+      {/* Hamburger icon is separated into a fixed overlay so it stays vertically on top of everything! */}
+      <div
+        className={`hamburger-menu ${isMenuOpen ? "open" : ""}`}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        style={{ position: 'fixed', top: '15px', left: '25px', margin: 0 }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </div>
+
       <header className="navbar">
-        <div 
-          className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <span className="hamburger-icon">☰</span>
-        </div>
+        {/* Placeholder keeps the visual spacing exactly intact since we extracted the button out for Z-index */}
+        <div className="hamburger-placeholder" style={{ width: '48px', height: '48px', marginBottom: '2px', flexShrink: 0 }} />
 
         <nav className="nav-tabs">
           <NavLink
@@ -24,15 +33,6 @@ const NavBar = () => {
             className={({ isActive }) => (isActive ? "tab active" : "tab")}
           >
             HOME
-          </NavLink>
-
-          <span className="separator">|</span>
-
-          <NavLink
-            to="/for-you"
-            className={({ isActive }) => (isActive ? "tab active" : "tab")}
-          >
-            FOR YOU
           </NavLink>
 
           <span className="separator">|</span>

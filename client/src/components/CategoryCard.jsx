@@ -1,12 +1,14 @@
 import React from "react";
 import "./CategoryCard.css";
 
-const CategoryCard = () => {
+const CategoryCard = ({ category }) => {
   return (
     <div className="category-card">
-      {/* Empty placeholder card as requested by the image */}
+      <h3 className="category-card-title">{category ? category.name : "Placeholder"}</h3>
     </div>
   );
 };
 
 export default CategoryCard;
+
+

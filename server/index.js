@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const articleRoutes = require("./routes/articleRoutes");
 const adminArticleRoutes = require("./routes/adminArticleRoutes");
 const userRoutes = require("./routes/userRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 dotenv.config();
 
@@ -31,6 +32,8 @@ app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/articles", articleRoutes); // Public API (Guests & Users)
 app.use("/api/admin/articles", adminArticleRoutes); // Admin API (Create, Update, Delete)
 app.use("/api/users", userRoutes); // User-specific routes
+app.use("/api/categories", categoryRoutes); // Category routes
+
 
 // 5. GEMINI AI CHATBOT ROUTE
 

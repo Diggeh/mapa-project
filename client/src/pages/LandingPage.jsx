@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import NavBar from "../components/navBar"; // 1. Import the NavBar component
+import NavBar from "../components/NavBar"; // 1. Import the NavBar component
 import ArticleCard from "../components/ArticleCard"; // 2. Import the ArticleCard component
 import HeroCard from "../components/HeroCard"; // 3. Import the HeroCard component
 import "./LandingPage.css"; // 4. Import the CSS for styling
@@ -94,6 +94,14 @@ const LandingPage = () => {
     return () => clearInterval(timer);
   }, [carouselArticles.length]);
 
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? carouselArticles.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev === carouselArticles.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div className="landing-container">
       <NavBar />
@@ -101,9 +109,13 @@ const LandingPage = () => {
       <main className="main-content">
         {/* Carousel Section Using HeroCard */}
         <section className="hero-section hero-carousel">
+          <button className="carousel-arrow left-arrow" onClick={handlePrev} aria-label="Previous slide">
+            &#10094;
+          </button>
+
           <div className="carousel-viewport">
-            <div 
-              className="carousel-inner" 
+            <div
+              className="carousel-inner"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
               {carouselArticles.map((articleData) => (
@@ -113,7 +125,11 @@ const LandingPage = () => {
               ))}
             </div>
           </div>
-          
+
+          <button className="carousel-arrow right-arrow" onClick={handleNext} aria-label="Next slide">
+            &#10095;
+          </button>
+
           <div className="carousel-indicators">
             {carouselArticles.map((_, idx) => (
               <button

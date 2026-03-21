@@ -2,6 +2,24 @@
   background-color: #ffffff;
   border-radius: 12px;
   width: 100%;
-  aspect-ratio: 2.5 / 1; /* Creates a long horizontal rectangle */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Slight soft shadow */
+  aspect-ratio: 2.8 / 1; /* Long horizontal rectangle matching original */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* Very subtle soft shadow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Slightly lifts up */
+}
+
+.category-card-title {
+  font-size: 20px;
+  color: #333333; /* Simple dark text */
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
 }

@@ -1,6 +1,7 @@
 /* CategoryPage.css */
 .category-page-container {
-  background-color: #eae7d9; /* The same beige background */
+  background-color: #eae7d9;
+  /* The same beige background */
   min-height: 100vh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -14,7 +15,8 @@
 
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns as per the image */
+  grid-template-columns: repeat(2, 1fr);
+  /* 2 columns as per the image */
   gap: 20px;
   width: 100%;
   max-width: 1200px;
@@ -24,4 +26,60 @@
   .category-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.section-title {
+  width: 100%;
+  max-width: 1200px;
+  text-align: left;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.mt-40 {
+  margin-top: 40px;
+}
+
+.age-group-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+.age-pill {
+  background-color: #ffffff;
+  border: 2px solid #a38d5f;
+  /* Base border on active tab color */
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #a38d5f;
+  /* Matches border */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Slight pop */
+}
+
+.age-pill:hover {
+  background-color: #f7f3e8;
+  /* Very light hover state */
+}
+
+.age-pill:active {
+  background-color: #a38d5f;
+  color: #fff;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 16px;
+  margin-top: 20px;
 }
