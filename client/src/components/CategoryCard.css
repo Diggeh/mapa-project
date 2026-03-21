@@ -1,0 +1,7 @@
+.category-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  aspect-ratio: 2.5 / 1; /* Creates a long horizontal rectangle */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Slight soft shadow */
+}

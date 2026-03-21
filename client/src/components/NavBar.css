@@ -8,6 +8,11 @@
   gap: 20px;
   /* This creates that thick beige bar running across the bottom of the screen */
   border-bottom: 26px solid #d1c8a3;
+  
+  /* Pin the navbar to the top */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .hamburger-menu {
@@ -21,13 +26,24 @@
   align-items: center;
   font-size: 24px;
   cursor: pointer;
-  margin-bottom: 8px; /* Keeps the circle vertically centered next to the tabs */
+  margin-bottom: 2px; /* Keeps the circle vertically centered next to the taller active tab */
+  
+  /* Matches the visual style from the reference image */
+  border: 2px solid #ffffff; 
+  box-sizing: border-box;
+
+  /* Animates the hamburger menu perfectly to slide across the screen with the side menu panel */
+  z-index: 1200;
+  transition: transform 0.3s ease, background-color 0.2s;
+}
+
+.hamburger-menu.open {
+  transform: translateX(231px); /* Slides the icon so it rests exactly halfway inside the 280px wide panel */
 }
 
 .nav-tabs {
   display: flex;
-  align-items: center;
-  /* Spacing between tabs and separators */
+  align-items: flex-end;
 }
 
 /* Update your existing .tab class to include these two lines */
@@ -36,13 +52,14 @@
   border: none;
   font-weight: 645;
   color: #000000;
-  padding: 5px 24px;
+  padding: 6px 24px;
   cursor: pointer;
   border-radius: 12px 12px 0 0;
   font-size: 15px;
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    background-color 0.3s ease,
+    color 0.3s ease,
+    padding 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Snappy pop-up animation */
 
   /* Add these two lines to prevent default link styling! */
   text-decoration: none;
@@ -51,8 +68,9 @@
 
 /* Active state for the tab we are currently on */
 .tab.active {
-  background-color: #a38d5f; /* Darker tan color */
+  background-color: #a38d5f; /* Darker tan color, reverted as requested */
   color: #ffffff; /* White text */
+  padding: 12px 24px 8px; /* Taller padding to make it pop up since flex-end aligns to bottom */
 }
 
 /* Optional hover effect for inactive tabs */
@@ -65,6 +83,8 @@
   color: #000000;
   font-weight: 600;
   font-size: 16px;
+  margin: 0 4px; /* Small precise margin to fix gaps */
+  margin-bottom: 4px; /* Line up correctly with inactive tabs */
 
   user-select: none; /* Prevents users from accidentally highlighting the line */
 }

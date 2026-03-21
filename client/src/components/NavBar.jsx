@@ -1,43 +1,60 @@
-import React from "react";
-import { NavLink } from "react-router-dom"; // 1. Import NavLink from react-router-dom
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
+import SideMenu from "./SideMenu";
 import "./NavBar.css";
 
 const NavBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <header className="navbar">
-      <div className="hamburger-menu">
-        <span className="hamburger-icon">☰</span>
-      </div>
-
-      <nav className="nav-tabs">
-        {/* 2. Replace <button> with <NavLink> */}
-        {/* The className takes a function that checks if this specific link is active */}
-        <NavLink
-          to="/"
-          className={({ isActive }) => (isActive ? "tab active" : "tab")}
+    <>
+      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      
+      <header className="navbar">
+        <div 
+          className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          HOME
-        </NavLink>
+          <span className="hamburger-icon">☰</span>
+        </div>
 
-        <span className="separator">|</span>
+        <nav className="nav-tabs">
+          <NavLink
+            to="/"
+            className={({ isActive }) => (isActive ? "tab active" : "tab")}
+          >
+            HOME
+          </NavLink>
 
-        <NavLink
-          to="/categories"
-          className={({ isActive }) => (isActive ? "tab active" : "tab")}
-        >
-          CATEGORY
-        </NavLink>
+          <span className="separator">|</span>
 
-        <span className="separator">|</span>
+          <NavLink
+            to="/for-you"
+            className={({ isActive }) => (isActive ? "tab active" : "tab")}
+          >
+            FOR YOU
+          </NavLink>
 
-        <NavLink
-          to="/bookmarks"
-          className={({ isActive }) => (isActive ? "tab active" : "tab")}
-        >
-          BOOKMARKS
-        </NavLink>
-      </nav>
-    </header>
+          <span className="separator">|</span>
+
+          <NavLink
+            to="/categories"
+            className={({ isActive }) => (isActive ? "tab active" : "tab")}
+          >
+            CATEGORY
+          </NavLink>
+
+          <span className="separator">|</span>
+
+          <NavLink
+            to="/bookmarks"
+            className={({ isActive }) => (isActive ? "tab active" : "tab")}
+          >
+            BOOKMARKS
+          </NavLink>
+        </nav>
+      </header>
+    </>
   );
 };
 

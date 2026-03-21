@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./ArticleCard.css";
 
-const ArticleCard = ({ article }) => {
+const ArticleCard = ({ article, isBookmarked }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -29,10 +29,10 @@ const ArticleCard = ({ article }) => {
           className="bookmark-btn"
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Bookmarked!");
+            console.log("Bookmarked status toggled!");
           }}
         >
-          ☆
+          {isBookmarked ? "★" : "☆"}
         </button>
       </div>
 

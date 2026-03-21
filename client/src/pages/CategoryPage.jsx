@@ -1,25 +1,26 @@
 import React from "react";
 import NavBar from "../components/navBar";
-// We can reuse the LandingPage CSS for the layout containers!
-import "./LandingPage.css";
+import CategoryCard from "../components/CategoryCard";
+import "./CategoryPage.css";
 
 const CategoryPage = () => {
+  // Mock array to render 8 cards
+  const mockCategories = Array.from({ length: 8 });
+
   return (
-    <div className="landing-container">
+    <div className="category-page-container">
       <NavBar />
 
-      {/* Reusing the beige box layout */}
-      <main
-        className="main-content"
-        style={{ minHeight: "50vh", justifyContent: "center" }}
-      >
-        <h1 style={{ color: "#333" }}>Categories</h1>
-        <p style={{ color: "#777" }}>
-          This is where the category filters will go!
-        </p>
+      <main className="category-page-content">
+        <section className="category-grid">
+          {mockCategories.map((_, idx) => (
+            <CategoryCard key={idx} />
+          ))}
+        </section>
       </main>
     </div>
   );
 };
 
 export default CategoryPage;
+
