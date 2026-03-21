@@ -1,5 +1,6 @@
 import React from "react";
-import "./NavBar.css"; // We will create this next
+import { NavLink } from "react-router-dom"; // 1. Import NavLink from react-router-dom
+import "./NavBar.css";
 
 const NavBar = () => {
   return (
@@ -7,11 +8,34 @@ const NavBar = () => {
       <div className="hamburger-menu">
         <span className="hamburger-icon">☰</span>
       </div>
+
       <nav className="nav-tabs">
-        <button className="tab active">HOME</button>
-        <button className="tab">FOR YOU</button>
-        <button className="tab">CATEGORY</button>
-        <button className="tab">BOOKMARKS</button>
+        {/* 2. Replace <button> with <NavLink> */}
+        {/* The className takes a function that checks if this specific link is active */}
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "tab active" : "tab")}
+        >
+          HOME
+        </NavLink>
+
+        <span className="separator">|</span>
+
+        <NavLink
+          to="/categories"
+          className={({ isActive }) => (isActive ? "tab active" : "tab")}
+        >
+          CATEGORY
+        </NavLink>
+
+        <span className="separator">|</span>
+
+        <NavLink
+          to="/bookmarks"
+          className={({ isActive }) => (isActive ? "tab active" : "tab")}
+        >
+          BOOKMARKS
+        </NavLink>
       </nav>
     </header>
   );

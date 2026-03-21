@@ -1,9 +1,8 @@
-import React from "react";
-// Use ../ to step out of the 'pages' folder and into the 'components' folder
-import NavBar from "../components/navBar";
-import ArticleCard from "../components/ArticleCard";
-import HeroCard from "../components/HeroCard";
-import "./LandingPage.css";
+import React, { useState, useEffect } from "react";
+import NavBar from "../components/navBar"; // 1. Import the NavBar component
+import ArticleCard from "../components/ArticleCard"; // 2. Import the ArticleCard component
+import HeroCard from "../components/HeroCard"; // 3. Import the HeroCard component
+import "./LandingPage.css"; // 4. Import the CSS for styling
 
 const mockDatabaseResponse = [
   {
@@ -46,21 +45,85 @@ const mockDatabaseResponse = [
     summary:
       "How responsive parenting in the first year of life wires the brain for lifelong emotional resilience.",
   },
+  {
+    _id: "6",
+    title: "Building Secure Attachments",
+    authors: ["Dr. Emily Chen"],
+    category: ["Attachment", "Infants"],
+    summary:
+      "How responsive parenting in the first year of life wires the brain for lifelong emotional resilience.",
+  },
+  {
+    _id: "7",
+    title: "Building Secure Attachments",
+    authors: ["Dr. Emily Chen"],
+    category: ["Attachment", "Infants"],
+    summary:
+      "How responsive parenting in the first year of life wires the brain for lifelong emotional resilience.",
+  },
+  {
+    _id: "8",
+    title: "Building Secure Attachments",
+    authors: ["Dr. Emily Chen"],
+    category: ["Attachment", "Infants"],
+    summary:
+      "How responsive parenting in the first year of life wires the brain for lifelong emotional resilience.",
+  },
+  {
+    _id: "9",
+    title: "Building Secure Attachments",
+    authors: ["Dr. Emily Chen"],
+    category: ["Attachment", "Infants"],
+    summary:
+      "How responsive parenting in the first year of life wires the brain for lifelong emotional resilience.",
+  },
 ];
 
 const LandingPage = () => {
-  // 2. Separate the data: First item for Hero, the rest for the Grid
-  const featuredArticle = mockDatabaseResponse[0];
-  const gridArticles = mockDatabaseResponse.slice(1);
+  // Use first 3 articles for the carousel, and the rest for the grid
+  const carouselArticles = mockDatabaseResponse.slice(0, 3);
+  const gridArticles = mockDatabaseResponse.slice(3);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-slide functionality
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev === carouselArticles.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [carouselArticles.length]);
 
   return (
     <div className="landing-container">
       <NavBar />
 
       <main className="main-content">
-        {/* 3. Drop in the HeroCard and pass it the data */}
-        <section className="hero-section">
-          <HeroCard article={featuredArticle} />
+        {/* Carousel Section Using HeroCard */}
+        <section className="hero-section hero-carousel">
+          <div className="carousel-viewport">
+            <div 
+              className="carousel-inner" 
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {carouselArticles.map((articleData) => (
+                <div className="carousel-item" key={articleData._id}>
+                  <HeroCard article={articleData} />
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="carousel-indicators">
+            {carouselArticles.map((_, idx) => (
+              <button
+                key={idx}
+                className={`carousel-dot ${idx === currentSlide ? "active" : ""}`}
+                onClick={() => setCurrentSlide(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
         </section>
 
         {/* Search Bar / Filter Pill */}

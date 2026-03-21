@@ -22,6 +22,58 @@
   max-width: 1200px;
 }
 
+/* --- Carousel Styles --- */
+.hero-carousel {
+  position: relative;
+  overflow: hidden; /* Hide slides that are out of bounds */
+  border-radius: 12px; /* Smooth edges around the carousel */
+}
+
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease-in-out; /* Smooth sliding animation */
+}
+
+.carousel-item {
+  min-width: 100%; /* Each slide takes up full width of viewport */
+  box-sizing: border-box;
+}
+
+/* Carousel Indicators (Dots) */
+.carousel-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-dot.active {
+  background-color: #ffffff; /* Solid white for the active slide */
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.carousel-dot:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+/* ----------------------- */
+
 /* Search Pill */
 .search-pill-container {
   width: 100%;
