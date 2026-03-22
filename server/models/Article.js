@@ -7,12 +7,11 @@ const articleSchema = new mongoose.Schema(
     sourceLink: { type: String, required: true }, // DOI, YT link, or website URL
     authors: [{ type: String, required: true }], // Array in case there are multiple
     publishedDate: { type: Date },
-    locality: {
-      type: String,
-      enum: ["local", "international"], // Restricts input to only these two options
-      required: true,
-    },
+    region: { type: String, enum: ["Local", "International"], default: "International", },
     category: [{ type: String, required: true }], // e.g., "Meltdowns", "Communication", "Trauma"
+    pdfpath: { type: String, required: true },
+    parsedText: { type: String },
+
   },
   { timestamps: true },
 ); // Automatically adds createdAt and updatedAt dates

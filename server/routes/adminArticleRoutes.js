@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs"); // Added for file deletion
 const path = require("path"); // Added for handling file paths
-const Article = require("../models/Article");
 const upload = require("../middleware/uploadMiddleware");
+const pdfParse = require("pdf-parse");
 const { verifyToken, verifyAdmin } = require("../middleware/authMiddleware");
 
 // 1. CREATE ARTICLE (Admin Only + PDF Upload)
@@ -17,8 +17,19 @@ router.post(
     try {
       const articleData = {
         ...req.body,
-        pdfPath: req.file ? req.file.path : null,
+        pdfpath: req.file ? req.file.path : null,
       };
+
+      if (req.file) {
+        try {
+          const absolutePath = path.resolve(req.file.path);
+          const dataBuffer = fs.readFileSync(absolutePath);
+          const pdfData = await pdfParse(dataBuffer);
+          articleData.parsedText = pdfData.text;
+        } catch (pdfErr) {
+          console.error("Error parsing PDF:", pdfErr);
+        }
+      }
 
       // Parsing strings into arrays for FormData compatibility
       if (typeof req.body.category === "string") {
@@ -55,7 +66,17 @@ router.put(
   async (req, res) => {
     try {
       let updateData = { ...req.body };
-      if (req.file) updateData.pdfPath = req.file.path;
+      if (req.file) {
+        updateData.pdfpath = req.file.path;
+        try {
+          const absolutePath = path.resolve(req.file.path);
+          const dataBuffer = fs.readFileSync(absolutePath);
+          const pdfData = await pdfParse(dataBuffer);
+          updateData.parsedText = pdfData.text;
+        } catch (pdfErr) {
+          console.error("Error parsing PDF:", pdfErr);
+        }
+      }
 
       const updatedArticle = await Article.findByIdAndUpdate(
         req.params.id,
@@ -76,14 +97,14 @@ router.put(
 
 router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    // 1. Find the article first to get the pdfPath
+    // 1. Find the article first to get the pdfpath
     const article = await Article.findById(req.params.id);
 
     if (!article) {
       return res.status(404).json({ message: "Article not found" });
     }
 
-    const filePath = article.pdfPath;
+    const filePath = article.pdfpath;
 
     // 2. Delete the record from MongoDB
     await Article.findByIdAndDelete(req.params.id);

@@ -4,9 +4,9 @@ const User = require("../models/User");
 const { verifyToken } = require("../middleware/authMiddleware");
 
 // 1. TOGGLE BOOKMARK
-// POST /api/users/bookmark/:articleId
+// POST /api/users/bookmarks/:articleId
 
-router.post("/bookmark/:articleId", verifyToken, async (req, res) => {
+router.post("/bookmarks/:articleId", verifyToken, async (req, res) => {
   try {
     // req.user.id comes straight from the verified JWT token
     const user = await User.findById(req.user.id);
@@ -20,13 +20,13 @@ router.post("/bookmark/:articleId", verifyToken, async (req, res) => {
       });
       return res
         .status(200)
-        .json({ message: "Article removed from bookmarks." });
+        .json({ message: "Article removed from bookmarks.", isBookmarked: false });
     } else {
       // If it isn't, add it
       await User.findByIdAndUpdate(req.user.id, {
         $push: { bookmarks: articleId },
       });
-      return res.status(200).json({ message: "Article added to bookmarks." });
+      return res.status(200).json({ message: "Article added to bookmarks.", isBookmarked: true });
     }
   } catch (error) {
     res
