@@ -3,7 +3,8 @@ const router = express.Router();
 const fs = require("fs"); // Added for file deletion
 const path = require("path"); // Added for handling file paths
 const upload = require("../middleware/uploadMiddleware");
-const pdfParse = require("pdf-parse");
+const pdfParse = require("pdf-parse-new");
+const Article = require("../models/Article");
 const { verifyToken, verifyAdmin } = require("../middleware/authMiddleware");
 
 // 1. CREATE ARTICLE (Admin Only + PDF Upload)

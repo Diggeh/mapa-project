@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './AdminSidebar.css';
 
 const AdminSidebar = () => {
+  const { logout } = useAuth();
+
   return (
     <aside className="admin-sidebar">
       <div className="admin-brand">
@@ -15,7 +18,9 @@ const AdminSidebar = () => {
         <NavLink to="/admin/users" className={({isActive}) => isActive ? "sidebar-link active" : "sidebar-link"}>Users</NavLink>
       </nav>
       <div className="admin-footer">
-        <NavLink to="/" className="sidebar-link return-home">← Back to Site</NavLink>
+        <button onClick={logout} className="sidebar-link logout-admin-btn" style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+          ⎘ Logout
+        </button>
       </div>
     </aside>
   );

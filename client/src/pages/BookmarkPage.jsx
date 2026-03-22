@@ -2,6 +2,8 @@ import React from "react";
 import NavBar from "../components/NavBar";
 import ArticleCard from "../components/ArticleCard";
 import mapaLogoSand from "../assets/Mapa-logo-sand.png";
+import { useAuth } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 import "./BookmarkPage.css";
 
 const mockDatabaseResponse = [
@@ -40,6 +42,11 @@ const mockDatabaseResponse = [
 ];
 
 const BookmarksPage = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) return null; // Avoids flash of redirect
+  if (!user) return <Navigate to="/" replace />;
+
   return (
     <div className="landing-container">
       <NavBar />

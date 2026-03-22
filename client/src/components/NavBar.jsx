@@ -1,14 +1,31 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import SideMenu from "./SideMenu";
+import AuthModal from "./AuthModal";
+import { useAuth } from "../context/AuthContext";
 import "./NavBar.css";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { user } = useAuth();
+
+  const handleBookmarksClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      alert("Please login or register to view your bookmarks.");
+      setIsAuthModalOpen(true);
+    }
+  };
 
   return (
     <>
-      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <SideMenu 
+        isOpen={isMenuOpen} 
+        onClose={() => setIsMenuOpen(false)} 
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+      />
 
       {/* Hamburger icon is separated into a fixed overlay so it stays vertically on top of everything! */}
       <div
@@ -49,6 +66,7 @@ const NavBar = () => {
           <NavLink
             to="/bookmarks"
             className={({ isActive }) => (isActive ? "tab active" : "tab")}
+            onClick={handleBookmarksClick}
           >
             BOOKMARKS
           </NavLink>
