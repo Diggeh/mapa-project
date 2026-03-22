@@ -18,7 +18,7 @@ const HeroCard = ({ article }) => {
       <div className="hero-content">
         <div className="hero-tags">
           <span className="hero-tag-pill">FEATURED</span>
-          {article.category.map((cat, index) => (
+          {article.category.slice(0, 4).map((cat, index) => (
             <span key={index} className="tag-pill">
               {cat}
             </span>

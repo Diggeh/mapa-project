@@ -30,16 +30,31 @@
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap; /* Still allow wrapping of the row, but pills themselves won't wrap internal text */
+}
+
+.hero-tag-pill, 
+.hero-tags .tag-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px; /* Consistent height for all pills */
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap; /* Prevent internal text from wrapping */
 }
 
 .hero-tag-pill {
   background-color: #513b99; /* Purple accent for the FEATURED tag */
   color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 12px;
-  text-transform: uppercase;
+}
+
+.hero-tags .tag-pill {
+  background-color: #e5e0cf;
+  color: #513b99;
 }
 
 .hero-title {
