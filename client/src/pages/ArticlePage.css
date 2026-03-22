@@ -1,0 +1,159 @@
+.article-page-container {
+  background-color: #eae7d9;
+  /* Same as LandingPage */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.article-content-wrapper {
+  background-color: #fcfaf0;
+  /* Off-white container background */
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+  /* Centered with auto margins */
+  padding: 3rem 4rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  min-height: 80vh;
+}
+
+.article-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.article-title {
+  font-family: "Georgia", serif;
+  /* Serif font for title */
+  font-size: 3.5rem;
+  color: #08060d;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.1;
+}
+
+.article-meta {
+  font-family: var(--sans);
+  color: #6b6375;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.author-name {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.publish-date {
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.article-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap; /* Added to keep tags contained */
+}
+
+.tag-pill {
+  background-color: #e5e0cf;
+  /* Same as HeroCard */
+  color: #513b99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bookmark-icon-large {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+  color: #d6cb97;
+  /* Muted gold */
+  transition: transform 0.2s ease;
+}
+
+.bookmark-icon-large:hover {
+  transform: scale(1.1);
+}
+
+.article-body {
+  font-family: var(--sans);
+  color: #333;
+  line-height: 1.6;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
+
+.article-body p {
+  margin-bottom: 1.5rem;
+}
+
+/* Floating Chat Button */
+.floating-chat-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #3f2cb3;
+  /* Purple from mockup */
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(63, 44, 179, 0.4);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-chat-btn:hover {
+  transform: scale(1.1);
+  background-color: #4b35d6;
+}
+
+.floating-chat-btn svg {
+  width: 30px;
+  height: 30px;
+  fill: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .article-content-wrapper {
+    padding: 2rem 1.5rem;
+    width: 95%;
+  }
+
+  .article-title {
+    font-size: 2.5rem;
+  }
+
+  .bookmark-icon-large {
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 2rem;
+  }
+}

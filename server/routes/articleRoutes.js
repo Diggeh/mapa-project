@@ -8,7 +8,12 @@ const Article = require("../models/Article");
 // ==========================================
 router.get("/", async (req, res) => {
   try {
-    const articles = await Article.find().sort({ createdAt: -1 });
+    const { category } = req.query;
+    let query = {};
+    if (category) {
+      query.category = category;
+    }
+    const articles = await Article.find(query).sort({ createdAt: -1 });
     res.status(200).json(articles);
   } catch (error) {
     res

@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import LandingPage from "./pages/LandingPage"; // We will build this next!
 import CategoryPage from "./pages/CategoryPage";
 import BookmarksPage from "./pages/BookmarkPage";
+import ArticlePage from "./pages/ArticlePage";
 // Admin Pages
 import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -22,11 +23,7 @@ function App() {
         <Route path="/bookmarks" element={<BookmarksPage />} />
 
         {/* Your Reusable Template Page */}
-        {/* The ":id" is a variable. It catches /article/1, /article/abc, etc. */}
-        <Route
-          path="/article/:id"
-          element={<div>Placeholder for Article Page Template</div>}
-        />
+        <Route path="/article/:id" element={<ArticlePage />} />
 
         {/* Admin Dashboard Routes */}
         <Route path="/admin" element={<AdminLayout />}>
