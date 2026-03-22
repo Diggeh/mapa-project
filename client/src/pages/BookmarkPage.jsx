@@ -1,5 +1,5 @@
 import React from "react";
-import NavBar from "../components/navBar";
+import NavBar from "../components/NavBar";
 import ArticleCard from "../components/ArticleCard";
 import mapaLogoSand from "../assets/Mapa-logo-sand.png";
 import "./BookmarkPage.css";
@@ -43,15 +43,15 @@ const BookmarksPage = () => {
   return (
     <div className="landing-container">
       <NavBar />
-      
+
       <main className="bookmarks-page-content">
         <header className="bookmarks-header">
           <img src={mapaLogoSand} alt="MAPA Logo" className="bookmarks-logo" />
-          
+
           <div className="bookmarks-search-container">
-            <input 
-              type="text" 
-              className="bookmarks-search-input" 
+            <input
+              type="text"
+              className="bookmarks-search-input"
               placeholder="search text"
             />
             <button className="bookmarks-search-icon">🔍</button>
@@ -60,10 +60,10 @@ const BookmarksPage = () => {
 
         <section className="bookmarks-grid">
           {mockDatabaseResponse.map((articleData) => (
-            <ArticleCard 
-              key={articleData._id} 
-              article={articleData} 
-              isBookmarked={true} 
+            <ArticleCard
+              key={articleData._id}
+              article={articleData}
+              isBookmarked={true}
             />
           ))}
         </section>
