@@ -1,0 +1,26 @@
+.search-pill-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-pill {
+  background-color: white;
+  width: 100%;
+  max-width: 500px;
+  height: 50px;
+  border: none;
+  border-radius: 25px;
+  /* Pill shape */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 0 20px;
+  font-size: 16px;
+  outline: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.search-pill:focus {
+  box-shadow: 0 4px 12px rgba(81, 59, 153, 0.2);
+  /* Slight purple glow on focus */
+}

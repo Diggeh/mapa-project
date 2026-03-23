@@ -4,6 +4,7 @@ import SideMenu from "./SideMenu";
 import AuthModal from "./AuthModal";
 import { useAuth } from "../context/AuthContext";
 import "./NavBar.css";
+import mapaLogo from "../assets/Mapa-logo-ocean.png";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -71,6 +72,10 @@ const NavBar = () => {
             BOOKMARKS
           </NavLink>
         </nav>
+
+        <div className="navbar-logo-container">
+          <img src={mapaLogo} alt="MAPA Logo" className="navbar-logo" />
+        </div>
       </header>
     </>
   );

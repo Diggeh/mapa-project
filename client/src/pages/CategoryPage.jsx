@@ -3,6 +3,7 @@ import axios from "axios";
 import NavBar from "../components/NavBar";
 import CategoryCard from "../components/CategoryCard";
 import ArticleCard from "../components/ArticleCard";
+import { useAuth } from "../context/AuthContext";
 import "./CategoryPage.css";
 
 const CategoryPage = () => {
@@ -11,6 +12,9 @@ const CategoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryArticles, setCategoryArticles] = useState([]);
   const [loadingArticles, setLoadingArticles] = useState(false);
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+
+  const { token, showToast } = useAuth();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -26,6 +30,48 @@ const CategoryPage = () => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    const fetchUserBookmarks = async () => {
+      if (!token) {
+        setBookmarkedIds([]);
+        return;
+      }
+      try {
+        const response = await axios.get("http://localhost:5000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setBookmarkedIds(response.data.bookmarks.map(b => b._id));
+      } catch (err) {
+        console.error("Failed to fetch user bookmarks", err);
+      }
+    };
+    fetchUserBookmarks();
+  }, [token]);
+
+  const toggleBookmark = async (articleId) => {
+    if (!token) {
+      showToast("Please login or register to bookmark articles.", "error");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`http://localhost:5000/api/users/bookmarks/${articleId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const isNowBookmarked = response.data.isBookmarked;
+      if (isNowBookmarked) {
+        setBookmarkedIds(prev => [...prev, articleId]);
+      } else {
+        setBookmarkedIds(prev => prev.filter(id => id !== articleId));
+      }
+      showToast(response.data.message, "success");
+    } catch (err) {
+      console.error("Bookmark toggle failed", err);
+      showToast(err.response?.data?.message || "Failed to update bookmark", "error");
+    }
+  };
+
   const handleCategoryClick = async (categoryObj) => {
     setSelectedCategory(categoryObj);
     setLoadingArticles(true);
@@ -39,8 +85,15 @@ const CategoryPage = () => {
     }
   };
 
-  const ageGroups = categories.filter(c => c.type === "Age Group");
-  const topics = categories.filter(c => c.type === "Topic");
+  const ageOrder = ["infant", "toddler", "preschool", "school", "teen"];
+  const ageGroups = categories
+    .filter((c) => c.type === "Age Group")
+    .sort((a, b) => {
+      const indexA = ageOrder.findIndex((key) => a.name.toLowerCase().includes(key));
+      const indexB = ageOrder.findIndex((key) => b.name.toLowerCase().includes(key));
+      return indexA - indexB;
+    });
+  const topics = categories.filter((c) => c.type === "Topic");
 
   return (
     <div className="category-page-container">
@@ -49,10 +102,9 @@ const CategoryPage = () => {
       <main className="category-page-content">
         {selectedCategory ? (
           <div className="category-articles-section">
-            <button 
-              className="back-btn" 
+            <button
+              className="back-btn"
               onClick={() => setSelectedCategory(null)}
-              style={{ marginBottom: "20px", padding: "10px 20px", cursor: "pointer", background: "none", border: "1px solid #ccc", borderRadius: "5px" }}
             >
               &larr; Back to Categories
             </button>
@@ -62,7 +114,12 @@ const CategoryPage = () => {
             ) : categoryArticles.length > 0 ? (
               <div className="category-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
                 {categoryArticles.map(article => (
-                  <ArticleCard key={article._id} article={article} />
+                  <ArticleCard 
+                    key={article._id} 
+                    article={article} 
+                    isBookmarked={bookmarkedIds.includes(article._id)}
+                    onBookmarkToggle={toggleBookmark}
+                  />
                 ))}
               </div>
             ) : (

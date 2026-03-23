@@ -47,7 +47,7 @@ app.post("/api/chat", async (req, res) => {
     const { userQuestion, paperText } = req.body;
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       systemInstruction:
         "You are the MAPA Research Assistant. Help parents understand the provided research paper using simple, supportive language. If the answer isn't in the text, say you don't know.",
     });

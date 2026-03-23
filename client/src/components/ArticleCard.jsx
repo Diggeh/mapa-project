@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./ArticleCard.css";
 
-const ArticleCard = ({ article, isBookmarked }) => {
+const ArticleCard = ({ article, isBookmarked, onBookmarkToggle }) => {
   const navigate = useNavigate();
 
   if (!article) return null; // Defensive check for deleted/missing articles
@@ -36,7 +36,9 @@ const ArticleCard = ({ article, isBookmarked }) => {
           className="bookmark-btn"
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Bookmarked status toggled!");
+            if (onBookmarkToggle) {
+              onBookmarkToggle(article._id);
+            }
           }}
         >
           {isBookmarked ? "★" : "☆"}

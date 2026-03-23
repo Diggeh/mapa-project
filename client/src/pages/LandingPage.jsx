@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar"; // 1. Import the NavBar component
 import ArticleCard from "../components/ArticleCard"; // 2. Import the ArticleCard component
 import HeroCard from "../components/HeroCard"; // 3. Import the HeroCard component
+import SearchPill from "../components/SearchPill"; // Import the new SearchPill component
 import "./LandingPage.css"; // 4. Import the CSS for styling
 
 const LandingPage = () => {
@@ -9,6 +10,7 @@ const LandingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -28,9 +30,20 @@ const LandingPage = () => {
     fetchArticles();
   }, []);
 
-  // Use first 3 articles for the carousel, and the rest for the grid
-  const carouselArticles = articles.slice(0, 3);
-  const gridArticles = articles.slice(3);
+  // Filter articles based on search title or categories
+  const filteredArticles = articles.filter(article => {
+    const term = searchQuery.toLowerCase();
+    const titleMatch = article.title.toLowerCase().includes(term);
+    const categoryMatch = article.category?.some(cat => cat.toLowerCase().includes(term));
+    return titleMatch || categoryMatch;
+  });
+
+  const isSearching = searchQuery.length > 0;
+
+  // Use first 3 articles for the carousel (if not searching)
+  const carouselArticles = isSearching ? [] : filteredArticles.slice(0, 3);
+  // Grid shows everything if searching; otherwise the rest after slice
+  const gridArticles = isSearching ? filteredArticles : filteredArticles.slice(3);
 
   // Auto-slide functionality
   useEffect(() => {
@@ -113,15 +126,7 @@ const LandingPage = () => {
           </section>
         )}
 
-        {/* Search Bar / Filter Pill */}
-        <div className="search-pill-container">
-          <input
-            type="text"
-            className="search-pill"
-            placeholder="Search articles by title or category..."
-            disabled // We will activate this later!
-          />
-        </div>
+        <SearchPill value={searchQuery} onChange={setSearchQuery} />
 
         {/* 4. Map the rest of the articles to the grid */}
         {gridArticles.length > 0 ? (
@@ -131,8 +136,8 @@ const LandingPage = () => {
             ))}
           </section>
         ) : (
-          <p className="no-articles-text" style={{ textAlign: "center", marginTop: "2rem" }}>
-            {articles.length === 0 ? "No articles found." : ""}
+          <p className="no-articles-text" style={{ textAlign: "center", marginTop: "2rem", width: "100%", fontSize: "1.2rem", color: "#6b6375" }}>
+            {isSearching ? "No articles match your search." : (articles.length === 0 ? "No articles found." : "")}
           </p>
         )}
       </main>

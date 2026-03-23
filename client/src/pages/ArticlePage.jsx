@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { useAuth } from "../context/AuthContext";
@@ -13,24 +13,34 @@ const ArticlePage = () => {
   const [error, setError] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+  // Chatbot state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    {
+      role: "bot",
+      text: "Hi! I'm your MAPA Research Assistant 🤖. Ask me anything about this article and I'll help you understand it in simple terms.",
+    },
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [isBotTyping, setIsBotTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     const fetchArticleAndStatus = async () => {
       try {
         setLoading(true);
-        // 1. Fetch the article
         const articleRes = await fetch(`http://localhost:5000/api/articles/${id}`);
         if (!articleRes.ok) throw new Error("Article not found");
         const articleData = await articleRes.json();
         setArticle(articleData);
 
-        // 2. If logged in, fetch the user's bookmarks to see if THIS article is bookmarked
         if (token) {
           const profileRes = await fetch("http://localhost:5000/api/users/profile", {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           });
           if (profileRes.ok) {
             const userData = await profileRes.json();
-            const bookmarked = userData.bookmarks.some(b => b._id === id);
+            const bookmarked = userData.bookmarks.some((b) => b._id === id);
             setIsBookmarked(bookmarked);
           }
         }
@@ -44,26 +54,69 @@ const ArticlePage = () => {
     fetchArticleAndStatus();
   }, [id, token]);
 
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    if (chatOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, chatOpen]);
+
   const toggleBookmark = async () => {
     if (!token) {
       showToast("Please login or register to bookmark articles.", "error");
-      // Optional: Logic to open auth modal could go here if moved to context
       return;
     }
-
     try {
       const response = await fetch(`http://localhost:5000/api/users/bookmarks/${id}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!response.ok) throw new Error("Failed to update bookmark");
-
       const data = await response.json();
       setIsBookmarked(data.isBookmarked);
       showToast(data.message, "success");
     } catch (err) {
       showToast(err.message, "error");
+    }
+  };
+
+  const sendMessage = async () => {
+    const question = inputValue.trim();
+    if (!question || isBotTyping) return;
+
+    const userMessage = { role: "user", text: question };
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setIsBotTyping(true);
+
+    try {
+      const paperText = article
+        ? `Title: ${article.title}\n\n${article.content}`
+        : "No article content available.";
+
+      const res = await fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userQuestion: question, paperText }),
+      });
+
+      if (!res.ok) throw new Error("Chat request failed");
+      const data = await res.json();
+      setMessages((prev) => [...prev, { role: "bot", text: data.answer }]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "Sorry, I couldn't process that. Please try again." },
+      ]);
+    } finally {
+      setIsBotTyping(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
 
@@ -85,7 +138,11 @@ const ArticlePage = () => {
         <div className="article-content-wrapper">
           <h2>Error</h2>
           <p>{error || "Article could not be loaded."}</p>
-          <button onClick={() => navigate("/")} className="tag-pill" style={{ marginTop: "1rem", cursor: "pointer" }}>
+          <button
+            onClick={() => navigate("/")}
+            className="tag-pill"
+            style={{ marginTop: "1rem", cursor: "pointer" }}
+          >
             Return Home
           </button>
         </div>
@@ -98,8 +155,8 @@ const ArticlePage = () => {
       <NavBar />
 
       <main className="article-content-wrapper">
-        <button 
-          className="bookmark-icon-large" 
+        <button
+          className="bookmark-icon-large"
           onClick={toggleBookmark}
           aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
         >
@@ -111,32 +168,106 @@ const ArticlePage = () => {
           <div className="article-meta">
             <span className="author-name">Author: {article.authors.join(", ")}</span>
             <span className="publish-date">
-              {article.publishedDate 
-                ? new Date(article.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+              {article.publishedDate
+                ? new Date(article.publishedDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
                 : "Date Published"}
             </span>
           </div>
           <div className="article-tags">
-            {article.category && article.category.map((tag, index) => (
-              <span key={index} className="tag-pill">{tag}</span>
-            ))}
+            {article.category &&
+              article.category.map((tag, index) => (
+                <span key={index} className="tag-pill">
+                  {tag}
+                </span>
+              ))}
             {article.region && <span className="tag-pill">{article.region}</span>}
           </div>
         </header>
 
         <section className="article-body">
-          {/* Using dangerouslySetInnerHTML if content has HTML, otherwise map paragraphs */}
-          {article.content.split('\n').map((paragraph, idx) => (
-            paragraph.trim() && <p key={idx}>{paragraph}</p>
-          ))}
+          {article.content.split("\n").map(
+            (paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>
+          )}
         </section>
       </main>
 
-      {/* Floating Chat Button */}
-      <button className="floating-chat-btn" aria-label="Open chat">
-        <svg viewBox="0 0 24 24">
-          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-        </svg>
+      {/* AI Chatbot */}
+      {chatOpen && (
+        <div className="chatbot-panel" role="dialog" aria-label="AI Research Assistant">
+          <div className="chatbot-header">
+            <div className="chatbot-header-info">
+              <div className="chatbot-avatar">🤖</div>
+              <div>
+                <p className="chatbot-name">MAPA Assistant</p>
+                <p className="chatbot-status">AI · Powered by Gemini</p>
+              </div>
+            </div>
+            <button
+              className="chatbot-close-btn"
+              onClick={() => setChatOpen(false)}
+              aria-label="Close chat"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="chatbot-messages">
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`chat-bubble-wrapper ${msg.role}`}>
+                {msg.role === "bot" && <div className="bot-icon">🤖</div>}
+                <div className={`chat-bubble ${msg.role}`}>{msg.text}</div>
+              </div>
+            ))}
+            {isBotTyping && (
+              <div className="chat-bubble-wrapper bot">
+                <div className="bot-icon">🤖</div>
+                <div className="chat-bubble bot typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <div className="chatbot-input-area">
+            <textarea
+              className="chatbot-input"
+              placeholder="Ask about this article…"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+            />
+            <button
+              className="chatbot-send-btn"
+              onClick={sendMessage}
+              disabled={isBotTyping || !inputValue.trim()}
+              aria-label="Send message"
+            >
+              ➤
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating AI Chat Button */}
+      <button
+        className={`floating-chat-btn ${chatOpen ? "active" : ""}`}
+        onClick={() => setChatOpen((prev) => !prev)}
+        aria-label="Open AI chat"
+      >
+        {chatOpen ? (
+          <span className="chat-btn-icon">✕</span>
+        ) : (
+          <>
+            <span className="chat-btn-icon">✦</span>
+            <span className="chat-btn-label">AI Chat</span>
+          </>
+        )}
       </button>
     </div>
   );
