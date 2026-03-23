@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const AdminArticles = () => {
   const [articles, setArticles] = useState([]);
@@ -20,6 +22,15 @@ const AdminArticles = () => {
   const [region, setRegion] = useState('International');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [pdfFile, setPdfFile] = useState(null);
+
+  const quillModules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['clean']
+    ]
+  }), []);
 
   const fetchData = async () => {
     try {
@@ -230,7 +241,14 @@ const AdminArticles = () => {
               
               <div className="form-group" style={{marginTop: '1rem'}}>
                 <label>Main Content (Summary)</label>
-                <textarea rows="4" value={content} onChange={e => setContent(e.target.value)} required></textarea>
+                <ReactQuill
+                  theme="snow"
+                  value={content}
+                  onChange={setContent}
+                  modules={quillModules}
+                  placeholder="Write your article summary here..."
+                  style={{background: '#1e293b', color: '#e2e8f0', borderRadius: '0.5rem'}}
+                />
               </div>
 
               <div className="form-group">

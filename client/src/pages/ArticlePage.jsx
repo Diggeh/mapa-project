@@ -90,8 +90,12 @@ const ArticlePage = () => {
     setIsBotTyping(true);
 
     try {
+      const stripHtml = (html) => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || '';
+      };
       const paperText = article
-        ? `Title: ${article.title}\n\n${article.content}`
+        ? `Title: ${article.title}\n\n${stripHtml(article.content)}`
         : "No article content available.";
 
       const res = await fetch("http://localhost:5000/api/chat", {
@@ -188,11 +192,22 @@ const ArticlePage = () => {
           </div>
         </header>
 
-        <section className="article-body">
-          {article.content.split("\n").map(
-            (paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>
-          )}
-        </section>
+        {(() => {
+          const isHtml = /<[a-z][\s\S]*>/i.test(article.content);
+          if (isHtml) {
+            // Fix: Quill/PDF paste inserts &nbsp; for every space, making text unbreakable
+            const cleaned = article.content.replace(/&nbsp;/gi, ' ');
+            return <section className="article-body" dangerouslySetInnerHTML={{ __html: cleaned }} />;
+          } else {
+            return (
+              <section className="article-body">
+                {article.content.split("\n").map(
+                  (paragraph, idx) => paragraph.trim() && <p key={idx}>{paragraph}</p>
+                )}
+              </section>
+            );
+          }
+        })()}
       </main>
 
       {/* AI Chatbot */}

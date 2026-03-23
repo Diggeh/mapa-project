@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import NavBar from "../components/NavBar";
 import ArticleCard from "../components/ArticleCard";
-import mapaLogoSand from "../assets/Mapa-logo-sand.png";
+import SearchPill from "../components/SearchPill";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import "./BookmarkPage.css";
 
 const BookmarksPage = () => {
-  const { user, loading, token } = useAuth();
+  const { user, loading, token, showToast } = useAuth();
   const [bookmarks, setBookmarks] = useState([]);
   const [loadingBookmarks, setLoadingBookmarks] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchBookmarks = async () => {
@@ -38,8 +40,39 @@ const BookmarksPage = () => {
     }
   }, [token, loading]);
 
+  const toggleBookmark = async (articleId) => {
+    if (!token) {
+      showToast("Please login or register to bookmark articles.", "error");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`http://localhost:5000/api/users/bookmarks/${articleId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const isNowBookmarked = response.data.isBookmarked;
+      if (!isNowBookmarked) {
+        // Since we are on the bookmarks page, unbookmarking should remove the article from the list
+        setBookmarks(prev => prev.filter(article => article._id !== articleId));
+      }
+      showToast(response.data.message, "success");
+    } catch (err) {
+      console.error("Bookmark toggle failed", err);
+      showToast(err.response?.data?.message || "Failed to update bookmark", "error");
+    }
+  };
+
   if (loading) return null; // Avoids flash of redirect
   if (!user) return <Navigate to="/" replace />;
+
+  const filteredBookmarks = bookmarks.filter((article) => {
+    const titleMatch = article.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const categoryMatch = article.category?.some(cat => 
+      cat.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return titleMatch || categoryMatch;
+  });
 
   return (
     <div className="landing-container">
@@ -47,30 +80,26 @@ const BookmarksPage = () => {
 
       <main className="bookmarks-page-content">
         <header className="bookmarks-header">
-          <img src={mapaLogoSand} alt="MAPA Logo" className="bookmarks-logo" />
-
-          <div className="bookmarks-search-container">
-            <input
-              type="text"
-              className="bookmarks-search-input"
-              placeholder="search text"
-            />
-            <button className="bookmarks-search-icon">🔍</button>
-          </div>
+          <SearchPill value={searchQuery} onChange={setSearchQuery} />
         </header>
 
         {loadingBookmarks ? (
           <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading bookmarks...</p>
-        ) : bookmarks.length > 0 ? (
+        ) : filteredBookmarks.length > 0 ? (
           <section className="bookmarks-grid">
-            {bookmarks.map((articleData) => (
+            {filteredBookmarks.map((articleData) => (
               <ArticleCard
                 key={articleData._id}
                 article={articleData}
                 isBookmarked={true}
+                onBookmarkToggle={toggleBookmark}
               />
             ))}
           </section>
+        ) : searchQuery ? (
+          <p style={{ textAlign: "center", marginTop: "2rem", color: "#666", fontSize: "1.2rem" }}>
+            No articles match your search.
+          </p>
         ) : (
           <p style={{ textAlign: "center", marginTop: "2rem", color: "#666", fontSize: "1.2rem" }}>
             No bookmarked articles.

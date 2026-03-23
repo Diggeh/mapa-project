@@ -56,13 +56,15 @@ const ArticleCard = ({ article, isBookmarked, onBookmarkToggle }) => {
         </div>
 
         <p className="card-summary">
-          {article.summary
-            ? article.summary.length > 100
-              ? `${article.summary.substring(0, 100)}...`
-              : article.summary
-            : article.content
-            ? `${article.content.substring(0, 100)}...`
-            : "No summary available."}
+          {(() => {
+            const stripHtml = (html) => {
+              const doc = new DOMParser().parseFromString(html, 'text/html');
+              return doc.body.textContent || '';
+            };
+            const raw = article.summary || article.content || '';
+            const text = stripHtml(raw);
+            return text.length > 100 ? `${text.substring(0, 100)}...` : text || "No summary available.";
+          })()}
         </p>
       </div>
 
