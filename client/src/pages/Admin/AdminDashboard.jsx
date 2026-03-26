@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../../utils/api';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ users: 0, articles: 0, categories: 0 });
@@ -11,16 +12,12 @@ const AdminDashboard = () => {
         const headers = { 'Authorization': `Bearer ${token}` };
         
         // Use Promise.all to fetch concurrently
-        const [usersRes, articlesRes, catsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/admin/users', { headers }),
-          fetch('http://localhost:5000/api/articles'),
-          fetch('http://localhost:5000/api/categories')
+        const [users, articles, categories] = await Promise.all([
+          apiFetch('/api/admin/users', { headers }),
+          apiFetch('/api/articles'),
+          apiFetch('/api/categories')
         ]);
         
-        const users = usersRes.ok ? await usersRes.json() : [];
-        const articles = articlesRes.ok ? await articlesRes.json() : [];
-        const categories = catsRes.ok ? await catsRes.json() : [];
-
         setStats({
           users: users.length || 0,
           articles: articles.length || 0,

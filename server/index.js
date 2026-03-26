@@ -15,10 +15,24 @@ const adminUserRoutes = require("./routes/adminUserRoutes");
 
 dotenv.config();
 
+// Check for required environment variables
+const requiredEnv = ["MONGODB_URI", "JWT_SECRET", "GEMINI_API_KEY"];
+requiredEnv.forEach((env) => {
+  if (!process.env[env]) {
+    console.error(`CRITICAL ERROR: Environment variable ${env} is missing!`);
+    process.exit(1);
+  }
+});
+
 const app = express();
 
 // 2. Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "*", // Fallback to * for development
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // 3. DATABASE CONNECTION

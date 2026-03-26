@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { apiFetch } from '../../utils/api';
 
 const AdminArticles = () => {
   const [articles, setArticles] = useState([]);
@@ -35,15 +36,10 @@ const AdminArticles = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [artRes, catRes] = await Promise.all([
-        fetch('http://localhost:5000/api/articles'),
-        fetch('http://localhost:5000/api/categories')
+      const [artData, catData] = await Promise.all([
+        apiFetch('/api/articles'),
+        apiFetch('/api/categories')
       ]);
-      
-      if (!artRes.ok || !catRes.ok) throw new Error('Failed to fetch data');
-      
-      const artData = await artRes.json();
-      const catData = await catRes.json();
       
       setArticles(artData);
       setCategories(catData);
@@ -90,11 +86,10 @@ const AdminArticles = () => {
     if (!window.confirm("Are you sure you want to delete this article?")) return;
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`http://localhost:5000/api/admin/articles/${id}`, {
+      await apiFetch(`/api/admin/articles/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to delete article');
       fetchData();
     } catch (err) {
       alert(err.message);
@@ -105,9 +100,9 @@ const AdminArticles = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token') || '';
-      const url = isEditing 
-        ? `http://localhost:5000/api/admin/articles/${currentId}` 
-        : 'http://localhost:5000/api/admin/articles';
+      const endpoint = isEditing 
+        ? `/api/admin/articles/${currentId}` 
+        : '/api/admin/articles';
       const method = isEditing ? 'PUT' : 'POST';
       
       const formData = new FormData();
@@ -120,18 +115,13 @@ const AdminArticles = () => {
       if (publishedDate) formData.append('publishedDate', publishedDate);
       if (pdfFile) formData.append('pdfFile', pdfFile);
 
-      const res = await fetch(url, {
+      await apiFetch(endpoint, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}` // Note: NO Content-Type header for FormData, browser sets it
+          'Authorization': `Bearer ${token}`
         },
         body: formData
       });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to save article');
-      }
       
       setShowModal(false);
       fetchData();

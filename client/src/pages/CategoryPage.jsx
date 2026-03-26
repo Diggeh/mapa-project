@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import NavBar from "../components/NavBar";
 import CategoryCard from "../components/CategoryCard";
 import ArticleCard from "../components/ArticleCard";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../utils/api";
 import "./CategoryPage.css";
 
 const CategoryPage = () => {
@@ -19,8 +19,8 @@ const CategoryPage = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/categories");
-        setCategories(response.data);
+        const data = await apiFetch("/api/categories");
+        setCategories(data);
       } catch (err) {
         console.error("Failed to fetch categories", err);
       } finally {
@@ -37,10 +37,10 @@ const CategoryPage = () => {
         return;
       }
       try {
-        const response = await axios.get("http://localhost:5000/api/users/profile", {
+        const data = await apiFetch("/api/users/profile", {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setBookmarkedIds(response.data.bookmarks.map(b => b._id));
+        setBookmarkedIds(data.bookmarks.map(b => b._id));
       } catch (err) {
         console.error("Failed to fetch user bookmarks", err);
       }
@@ -55,20 +55,21 @@ const CategoryPage = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/users/bookmarks/${articleId}`, {}, {
+      const data = await apiFetch(`/api/users/bookmarks/${articleId}`, {
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      const isNowBookmarked = response.data.isBookmarked;
+      const isNowBookmarked = data.isBookmarked;
       if (isNowBookmarked) {
         setBookmarkedIds(prev => [...prev, articleId]);
       } else {
         setBookmarkedIds(prev => prev.filter(id => id !== articleId));
       }
-      showToast(response.data.message, "success");
+      showToast(data.message, "success");
     } catch (err) {
       console.error("Bookmark toggle failed", err);
-      showToast(err.response?.data?.message || "Failed to update bookmark", "error");
+      showToast(err.message || "Failed to update bookmark", "error");
     }
   };
 
@@ -76,8 +77,8 @@ const CategoryPage = () => {
     setSelectedCategory(categoryObj);
     setLoadingArticles(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/articles?category=${encodeURIComponent(categoryObj.name)}`);
-      setCategoryArticles(response.data);
+      const data = await apiFetch(`/api/articles?category=${encodeURIComponent(categoryObj.name)}`);
+      setCategoryArticles(data);
     } catch (err) {
       console.error("Failed to fetch categorized articles", err);
     } finally {

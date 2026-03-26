@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../utils/api';
 import './AuthModal.css';
 
 const AuthModal = ({ isOpen, onClose }) => {
@@ -20,18 +21,13 @@ const AuthModal = ({ isOpen, onClose }) => {
     setLoading(true);
     
     // Defaulting to user role explicitly on register since admin should only be granted by other admins
-    const url = isLogin ? 'http://localhost:5000/api/auth/login' : 'http://localhost:5000/api/auth/register';
+    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
     
     try {
-      const res = await fetch(url, {
+      const data = await apiFetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role: 'user' }) 
       });
-      
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.message || 'Authentication failed');
       
       if (isLogin) {
         // Backend login returns { token, user: { id, email, role } }

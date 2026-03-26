@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import NavBar from "../components/NavBar";
 import ArticleCard from "../components/ArticleCard";
 import SearchPill from "../components/SearchPill";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import { apiFetch } from "../utils/api";
 import "./BookmarkPage.css";
 
 const BookmarksPage = () => {
@@ -17,15 +17,12 @@ const BookmarksPage = () => {
     const fetchBookmarks = async () => {
       if (!token) return;
       try {
-        const response = await fetch("http://localhost:5000/api/users/profile", {
+        const data = await apiFetch("/api/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        if (response.ok) {
-          const data = await response.json();
-          setBookmarks(data.bookmarks || []);
-        }
+        setBookmarks(data.bookmarks || []);
       } catch (err) {
         console.error("Failed to fetch bookmarks:", err);
       } finally {
@@ -47,19 +44,20 @@ const BookmarksPage = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/users/bookmarks/${articleId}`, {}, {
+      const data = await apiFetch(`/api/users/bookmarks/${articleId}`, {
+        method: "POST",
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      const isNowBookmarked = response.data.isBookmarked;
+      const isNowBookmarked = data.isBookmarked;
       if (!isNowBookmarked) {
         // Since we are on the bookmarks page, unbookmarking should remove the article from the list
         setBookmarks(prev => prev.filter(article => article._id !== articleId));
       }
-      showToast(response.data.message, "success");
+      showToast(data.message, "success");
     } catch (err) {
       console.error("Bookmark toggle failed", err);
-      showToast(err.response?.data?.message || "Failed to update bookmark", "error");
+      showToast(err.message || "Failed to update bookmark", "error");
     }
   };
 

@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar"; // 1. Import the NavBar component
 import ArticleCard from "../components/ArticleCard"; // 2. Import the ArticleCard component
 import HeroCard from "../components/HeroCard"; // 3. Import the HeroCard component
 import SearchPill from "../components/SearchPill"; // Import the new SearchPill component
+import { apiFetch } from "../utils/api";
 import "./LandingPage.css"; // 4. Import the CSS for styling
 
 const LandingPage = () => {
@@ -15,11 +16,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/articles");
-        if (!response.ok) {
-          throw new Error("Failed to fetch articles");
-        }
-        const data = await response.json();
+        const data = await apiFetch("/api/articles");
         setArticles(data);
       } catch (err) {
         setError(err.message);

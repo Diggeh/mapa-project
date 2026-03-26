@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../../utils/api';
 import './AdminCategories.css';
 
 const AdminCategories = () => {
@@ -16,9 +17,7 @@ const AdminCategories = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/categories'); // Adjust if no proxy
-      if (!res.ok) throw new Error('Failed to fetch categories');
-      const data = await res.json();
+      const data = await apiFetch('/api/categories');
       setCategories(data);
     } catch (err) {
       setError(err.message);
@@ -52,16 +51,12 @@ const AdminCategories = () => {
     try {
       // Assuming token is saved in localStorage. Update as per auth setup.
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+      await apiFetch(`/api/admin/categories/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Failed to delete category');
-      }
       fetchCategories();
     } catch (err) {
       alert(err.message);
@@ -72,24 +67,18 @@ const AdminCategories = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token') || '';
-      const url = isEditing 
-        ? `http://localhost:5000/api/admin/categories/${currentId}` 
-        : 'http://localhost:5000/api/admin/categories';
+      const endpoint = isEditing 
+        ? `/api/admin/categories/${currentId}` 
+        : '/api/admin/categories';
       const method = isEditing ? 'PUT' : 'POST';
       
-      const res = await fetch(url, {
+      await apiFetch(endpoint, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Provide proper auth context retrieval in future
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ name, type })
       });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to save category');
-      }
       
       setShowModal(false);
       fetchCategories();

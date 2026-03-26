@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../../utils/api';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -9,11 +10,9 @@ const AdminUsers = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token') || '';
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const data = await apiFetch('/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch users');
-      const data = await res.json();
       setUsers(data);
     } catch (err) {
       setError(err.message);
@@ -29,18 +28,13 @@ const AdminUsers = () => {
   const handleRoleChange = async (userId, newRole) => {
     try {
       const token = localStorage.getItem('token') || '';
-      const res = await fetch(`http://localhost:5000/api/admin/users/${userId}/role`, {
+      await apiFetch(`/api/admin/users/${userId}/role`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ role: newRole })
       });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to update role');
-      }
       // Update local state without re-fetching
       setUsers(prev => prev.map(u => u._id === userId ? { ...u, role: newRole } : u));
     } catch (err) {

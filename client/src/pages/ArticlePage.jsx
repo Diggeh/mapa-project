@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../utils/api";
 import "./ArticlePage.css";
 
 const ArticlePage = () => {
@@ -29,19 +30,18 @@ const ArticlePage = () => {
     const fetchArticleAndStatus = async () => {
       try {
         setLoading(true);
-        const articleRes = await fetch(`http://localhost:5000/api/articles/${id}`);
-        if (!articleRes.ok) throw new Error("Article not found");
-        const articleData = await articleRes.json();
+        const articleData = await apiFetch(`/api/articles/${id}`);
         setArticle(articleData);
 
         if (token) {
-          const profileRes = await fetch("http://localhost:5000/api/users/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (profileRes.ok) {
-            const userData = await profileRes.json();
+          try {
+            const userData = await apiFetch("/api/users/profile", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
             const bookmarked = userData.bookmarks.some((b) => b._id === id);
             setIsBookmarked(bookmarked);
+          } catch (profileErr) {
+            console.error("Failed to fetch profile:", profileErr);
           }
         }
       } catch (err) {
@@ -67,12 +67,10 @@ const ArticlePage = () => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/users/bookmarks/${id}`, {
+      const data = await apiFetch(`/api/users/bookmarks/${id}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error("Failed to update bookmark");
-      const data = await response.json();
       setIsBookmarked(data.isBookmarked);
       showToast(data.message, "success");
     } catch (err) {
@@ -98,14 +96,11 @@ const ArticlePage = () => {
         ? `Title: ${article.title}\n\n${stripHtml(article.content)}`
         : "No article content available.";
 
-      const res = await fetch("http://localhost:5000/api/chat", {
+      const data = await apiFetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userQuestion: question, paperText }),
       });
 
-      if (!res.ok) throw new Error("Chat request failed");
-      const data = await res.json();
       setMessages((prev) => [...prev, { role: "bot", text: data.answer }]);
     } catch (err) {
       setMessages((prev) => [
