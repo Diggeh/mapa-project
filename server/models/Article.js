@@ -9,7 +9,7 @@ const articleSchema = new mongoose.Schema(
     publishedDate: { type: Date },
     region: { type: String, enum: ["Local", "International"], default: "International", },
     category: [{ type: String, required: true }], // e.g., "Meltdowns", "Communication", "Trauma"
-    pdfpath: { type: String, required: true },
+    pdfpath: { type: String },
     parsedText: { type: String },
 
   },
