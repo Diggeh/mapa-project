@@ -69,6 +69,18 @@ router.put(
   async (req, res) => {
     try {
       let updateData = { ...req.body };
+
+      // Parsing strings into arrays for FormData compatibility
+      if (typeof updateData.category === "string") {
+        updateData.category = updateData.category.split(",").map((c) => c.trim());
+      }
+      if (typeof updateData.authors === "string") {
+        updateData.authors = updateData.authors.split(",").map((a) => a.trim());
+      }
+      if (typeof updateData.keyTakeaways === "string") {
+        updateData.keyTakeaways = updateData.keyTakeaways.split(",").map((k) => k.trim());
+      }
+
       if (req.file) {
         updateData.pdfpath = req.file.path;
         try {
