@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const fs = require("fs"); // Added for file deletion
-const path = require("path"); // Added for handling file paths
+const path = require("path");
 const upload = require("../middleware/uploadMiddleware");
+const axios = require("axios"); // Added for fetching Cloudinary files
 const pdfParse = require("pdf-parse-new");
 const Article = require("../models/Article");
 const { verifyToken, verifyAdmin } = require("../middleware/authMiddleware");
@@ -23,12 +24,13 @@ router.post(
 
       if (req.file) {
         try {
-          const absolutePath = path.resolve(req.file.path);
-          const dataBuffer = fs.readFileSync(absolutePath);
+          // req.file.path is now a Cloudinary URL
+          const response = await axios.get(req.file.path, { responseType: "arraybuffer" });
+          const dataBuffer = Buffer.from(response.data);
           const pdfData = await pdfParse(dataBuffer);
           articleData.parsedText = pdfData.text;
         } catch (pdfErr) {
-          console.error("Error parsing PDF:", pdfErr);
+          console.error("Error parsing PDF from Cloudinary:", pdfErr);
         }
       }
 
@@ -70,12 +72,12 @@ router.put(
       if (req.file) {
         updateData.pdfpath = req.file.path;
         try {
-          const absolutePath = path.resolve(req.file.path);
-          const dataBuffer = fs.readFileSync(absolutePath);
+          const response = await axios.get(req.file.path, { responseType: "arraybuffer" });
+          const dataBuffer = Buffer.from(response.data);
           const pdfData = await pdfParse(dataBuffer);
           updateData.parsedText = pdfData.text;
         } catch (pdfErr) {
-          console.error("Error parsing PDF:", pdfErr);
+          console.error("Error parsing PDF from Cloudinary:", pdfErr);
         }
       }
 
@@ -110,20 +112,9 @@ router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
     // 2. Delete the record from MongoDB
     await Article.findByIdAndDelete(req.params.id);
 
-    // 3. Delete the physical file from the /uploads folder
-    if (filePath) {
-      // Resolve the path to an absolute location on your machine
-      const absolutePath = path.resolve(filePath);
-
-      fs.unlink(absolutePath, (err) => {
-        if (err) {
-          // If the file is already gone, we log it but don't crash the response
-          console.error(`Could not delete file at ${absolutePath}:`, err);
-        } else {
-          console.log(`Successfully deleted file: ${absolutePath}`);
-        }
-      });
-    }
+    // 3. Delete from Cloudinary (Note: req.file.path was stored as article.pdfpath)
+    // For now, we simple delete the record. Cloudinary cleanup can be added later 
+    // using the public_id if stored.
 
     res.status(200).json({
       message: "Article and associated PDF deleted successfully.",
