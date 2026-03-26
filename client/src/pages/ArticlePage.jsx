@@ -174,12 +174,13 @@ const ArticlePage = () => {
             <span className="publish-date">
               {article.publishedDate
                 ? new Date(article.publishedDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
                 : "Date Published"}
             </span>
+            <span className="source-link">Source: <a href={article.sourceLink}>{article.sourceLink}</a></span>
           </div>
           <div className="article-tags">
             {article.category &&
