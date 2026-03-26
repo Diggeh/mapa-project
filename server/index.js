@@ -28,12 +28,17 @@ const app = express();
 
 // 2. Middleware
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "*", // Fallback to * for development
+  origin: "*", // Fallback to * for development
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// 2.5 Health Check (To verify if the server is actually up)
+
+app.get("/", (req, res) => {
+  res.send("MAPA Server is running perfectly!");
+});
 
 // 3. DATABASE CONNECTION
 
