@@ -75,7 +75,7 @@ const AdminArticles = () => {
     setContent(art.content);
     setSourceLink(art.sourceLink);
     setAuthorsStr(art.authors?.join(', ') || '');
-    setPublishedDate(art.publishedDate ? art.publishedDate.split('T')[0] : '');
+    setPublishedDate(art.publishedDate || '');
     setRegion(art.region || 'International');
     setSelectedCategories(art.category || []);
     setPdfFile(null); // Keep null unless user uploads a new one
@@ -209,7 +209,8 @@ const AdminArticles = () => {
                 </div>
                 <div className="form-group">
                   <label>Published Date</label>
-                  <input type="date" value={publishedDate} onChange={e => setPublishedDate(e.target.value)} />
+                  <input type="text" value={publishedDate} onChange={e => setPublishedDate(e.target.value)} placeholder="MM/DD/YYYY or MM/YYYY" />
+                  <small style={{color: 'var(--admin-text-muted)'}}>Accepts MM/DD/YYYY or MM/YYYY</small>
                 </div>
                 <div className="form-group">
                   <label>Region</label>
