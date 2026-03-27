@@ -19,30 +19,15 @@
   width: 100%;
 }
 
-
-/* Grid Layout Matches LandingPage */
+/* Grid Layout */
 .bookmarks-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 25px;
   width: 100%;
 }
 
-
-
-
-/* Responsiveness */
-@media (max-width: 1024px) {
-  .bookmarks-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
-  .bookmarks-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
   .bookmarks-header {
     flex-direction: column;
     gap: 20px;

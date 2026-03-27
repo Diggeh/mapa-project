@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import NavBar from "../components/NavBar"; // 1. Import the NavBar component
-import ArticleCard from "../components/ArticleCard"; // 2. Import the ArticleCard component
-import HeroCard from "../components/HeroCard"; // 3. Import the HeroCard component
-import SearchPill from "../components/SearchPill"; // Import the new SearchPill component
+import NavBar from "../components/NavBar";
+import ArticleCard from "../components/ArticleCard";
+import HeroCard from "../components/HeroCard";
+import SearchPill from "../components/SearchPill";
+import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../utils/api";
-import "./LandingPage.css"; // 4. Import the CSS for styling
+import "./LandingPage.css";
 
 const LandingPage = () => {
+  const { token, showToast } = useAuth();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -26,6 +29,46 @@ const LandingPage = () => {
     };
     fetchArticles();
   }, []);
+
+  useEffect(() => {
+    const fetchUserBookmarks = async () => {
+      if (!token) {
+        setBookmarkedIds([]);
+        return;
+      }
+      try {
+        const data = await apiFetch("/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setBookmarkedIds(data.bookmarks.map(b => b._id));
+      } catch (err) {
+        console.error("Failed to fetch user bookmarks", err);
+      }
+    };
+    fetchUserBookmarks();
+  }, [token]);
+
+  const toggleBookmark = async (articleId) => {
+    if (!token) {
+      showToast("Please login or register to bookmark articles.", "error");
+      return;
+    }
+    try {
+      const data = await apiFetch(`/api/users/bookmarks/${articleId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (data.isBookmarked) {
+        setBookmarkedIds(prev => [...prev, articleId]);
+      } else {
+        setBookmarkedIds(prev => prev.filter(id => id !== articleId));
+      }
+      showToast(data.message, "success");
+    } catch (err) {
+      console.error("Bookmark toggle failed", err);
+      showToast(err.message || "Failed to update bookmark", "error");
+    }
+  };
 
   // Filter articles based on search title or categories
   const filteredArticles = articles.filter(article => {
@@ -129,7 +172,12 @@ const LandingPage = () => {
         {gridArticles.length > 0 ? (
           <section className="article-grid">
             {gridArticles.map((articleData) => (
-              <ArticleCard key={articleData._id} article={articleData} />
+              <ArticleCard
+                key={articleData._id}
+                article={articleData}
+                isBookmarked={bookmarkedIds.includes(articleData._id)}
+                onBookmarkToggle={toggleBookmark}
+              />
             ))}
           </section>
         ) : (
